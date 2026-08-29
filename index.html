@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bob, What's you?</title>
+  
+  <!-- Google Analytics (GA4) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-23XEY0EJJ3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-23XEY0EJJ3');
+  </script>
+
+  <style>
+    :root {
+      --green: #2e7d32;
+      --orange: #ef6c00;
+      --red: #c62828;
+      --gray: #616161;
+      --bg: #f5f6f8;
+      --card: #ffffff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Malgun Gothic', sans-serif;
+      background: var(--bg);
+      margin: 0;
+      padding: 16px;
+      color: #222;
+      max-width: 480px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    h1 {
+      font-size: 20px;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+    .status-card {
+      background: var(--card);
+      border-radius: 14px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      margin-bottom: 16px;
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 10px 24px;
+      border-radius: 999px;
+      color: #fff;
+      font-weight: bold;
+      font-size: 18px;
+      margin-bottom: 10px;
+      transition: background 0.3s;
+    }
+    .status-badge.green { background: var(--green); }
+    .status-badge.orange { background: var(--orange); }
+    .status-badge.red { background: var(--red); }
+    .status-badge.gray { background: var(--gray); }
+    .queue-info {
+      font-size: 20px;
+      font-weight: bold;
+      color: #333;
+      margin-top: 6px;
+    }
+    .updated {
+      font-size: 12px;
+      color: #999;
+      margin-top: 8px;
+    }
+    .menu-card {
+      background: var(--card);
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .tabs {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      gap: 4px;
+    }
+    .tab {
+      flex: 1;
+      text-align: center;
+      padding: 8px 0;
+      border-radius: 8px;
+      background: #eee;
+      font-size: 13px;
+      cursor: pointer;
+      color: #555;
+      user-select: none;
+    }
+    .tab.today {
+      box-shadow: inset 0 0 0 2px #1a73e8;
+      color: #1a73e8;
+      font-weight: bold;
+    }
+    .tab.selected {
+      background: #1a73e8;
+      color: #fff;
+    }
+    .tab.selected.today {
+      box-shadow: none;
+    }
+    .menu-detail {
+      text-align: center;
+      padding: 10px 0;
+      min-height: 60px;
+    }
+    .menu-date {
+      font-size: 12px;
+      color: #999;
+      margin-bottom: 4px;
+    }
+    .menu-name {
+      font-size: 17px;
+      font-weight: bold;
+      white-space: pre-line;
+      margin-bottom: 6px;
+    }
+    .menu-note {
+      font-size: 13px;
+      color: #777;
+    }
+    .refresh-btn {
+      display: block;
+      margin: 16px auto 0;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 8px;
+      background: #1a73e8;
+      color: #fff;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .notice-banner {
+      display: none;
+      background: #fff8e1;
+      border: 1px solid #ffca28;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 13px;
+      color: #7a5c00;
+      margin-bottom: 16px;
+      line-height: 1.5;
+      white-space: pre-line;
+    }
+    .notice-banner.show {
+      display: block;
+    }
+    .notice-banner strong {
+      margin-right: 4px;
+    }
+    .footer-logo {
+      text-align: center;
+      margin-top: 18px;
+      padding-top: 14px;
+      border-top: 1px solid #e5e5e5;
+    }
+    .footer-logo img {
+      max-width: 140px;
+      height: auto;
+      opacity: 0.85;
+    }
+  </style>
+</head>
+<body>
+  <h1>🍽 Bob, What's you?</h1>
+
+  <div class="notice-banner" id="noticeBanner"></div>
+
+  <div class="status-card">
+    <div id="statusBadge" class="status-badge gray">불러오는 중...</div>
+    <div class="queue-info" id="queueInfo">대기줄 위치 확인 중...</div>
+    <div class="updated" id="updatedInfo"></div>
+  </div>
+
+  <div class="menu-card">
+    <div class="tabs" id="tabs"></div>
+    <div class="menu-detail" id="menuDetail">메뉴 불러오는 중...</div>
+  </div>
+
+  <button class="refresh-btn" onclick="loadAll()">새로고침</button>
+
+  <div class="footer-logo">
+    <img src="https://www.daegu.go.kr/cmsh/daegu.go.kr/images/2023/common/logo_header.png" alt="대구광역시 로고">
+  </div>
+
+  <script>
+    // 새로 배포한 Apps Script API URL 주소를 아래에 입력하세요.
+    const API_URL = "https://script.google.com/macros/s/YOUR_NEW_SCRIPT_ID/exec";
+
+    let menuDays = [];
+    let todayIndex = -1;
+    let selectedIndex = 0;
+
+    const statusColorMap = {
+      '운영중': 'green',
+      '이용불가-조리중': 'orange',
+      '이용불가-만석': 'red',
+      '운영종료': 'gray'
+    };
+
+    async function loadAll() {
+      try {
+        const response = await fetch(API_URL);
+        if (!response.ok) throw new Error('네트워크 응답 오류 (' + response.status + ')');
+
+        const json = await response.json();
+        if (!json.success) throw new Error(json.error || '데이터 반환 실패');
+
+        renderStatus(json.data.status);
+        renderMenu(json.data.menu);
+      } catch (err) {
+        showError('데이터', err);
+      }
+    }
+
+    function showError(label, err) {
+      console.error(label + ' 로드 실패:', err);
+      const badge = document.getElementById('statusBadge');
+      badge.className = 'status-badge red';
+      badge.textContent = '오류 발생';
+      document.getElementById('queueInfo').textContent =
+        label + '를 불러오지 못했습니다: ' + (err && err.message ? err.message : err);
+      document.getElementById('menuDetail').textContent =
+        '메뉴를 불러오지 못했습니다. 백엔드 URL 설정 또는 CORS 환경을 확인하세요.';
+    }
+
+    function renderStatus(data) {
+      if (!data) return;
+      const badge = document.getElementById('statusBadge');
+      const color = statusColorMap[data.status] || 'gray';
+      badge.className = 'status-badge ' + color;
+      badge.textContent = data.status;
+      document.getElementById('queueInfo').textContent = '📍 대기줄 위치: ' + data.queueLocation;
+      document.getElementById('updatedInfo').textContent = '마지막 업데이트: ' + data.lastUpdated;
+
+      const noticeEl = document.getElementById('noticeBanner');
+      if (data.notice) {
+        noticeEl.innerHTML = '<strong>📢 공지</strong> ' + escapeHtml_(data.notice);
+        noticeEl.classList.add('show');
+      } else {
+        noticeEl.classList.remove('show');
+        noticeEl.innerHTML = '';
+      }
+    }
+
+    function escapeHtml_(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function renderMenu(data) {
+      if (!data) return;
+      menuDays = data.days;
+      todayIndex = data.todayIndex;
+      selectedIndex = todayIndex >= 0 ? todayIndex : 0;
+      renderTabs();
+      renderMenuDetail();
+    }
+
+    function renderTabs() {
+      const tabsEl = document.getElementById('tabs');
+      tabsEl.innerHTML = '';
+      menuDays.forEach((d, i) => {
+        const tab = document.createElement('div');
+        tab.textContent = d.day;
+        tab.className = 'tab';
+        if (i === todayIndex) tab.classList.add('today');
+        if (i === selectedIndex) tab.classList.add('selected');
+        tab.addEventListener('click', () => {
+          selectedIndex = i;
+          renderTabs();
+          renderMenuDetail();
+        });
+        tabsEl.appendChild(tab);
+      });
+    }
+
+    function renderMenuDetail() {
+      const d = menuDays[selectedIndex];
+      const el = document.getElementById('menuDetail');
+      if (!d) { el.textContent = '등록된 메뉴가 없습니다.'; return; }
+      el.innerHTML =
+        '<div class="menu-date">' + d.day + '요일 · ' + d.date + '</div>' +
+        '<div class="menu-name">' + (d.menu || '메뉴 미등록') + '</div>' +
+        (d.note ? '<div class="menu-note">' + d.note + '</div>' : '');
+    }
+
+    // 초기 실행 및 10초 간격 자동 갱신
+    loadAll();
+    setInterval(loadAll, 10000);
+  </script>
+</body>
+</html>
