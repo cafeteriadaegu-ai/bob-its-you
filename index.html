@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bob, It's you!</title>
 
+  <!-- 데이터를 가져올 구글 서버와 미리 연결을 맺어둬서 첫 요청 속도 개선 -->
+  <link rel="preconnect" href="https://docs.google.com">
+  <link rel="dns-prefetch" href="https://docs.google.com">
+
   <!-- Google Analytics (GA4) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-QESS83V2DE"></script>
   <script>
@@ -178,7 +182,7 @@
 
   <div class="status-card">
     <div id="statusBadge" class="status-badge gray">불러오는 중...</div>
-    <div class="queue-info" id="queueInfo">대기줄 불러오는 중...</div>
+    <div class="queue-info" id="queueInfo">대기줄 위치 확인 중...</div>
     <div class="updated" id="updatedInfo"></div>
   </div>
 
@@ -256,8 +260,8 @@
 
     const statusColorMap = {
       '운영중': 'green',
-      '배식중지-조리중': 'orange',
-      '배식중지-만석': 'red',
+      '이용불가-조리중': 'orange',
+      '이용불가-만석': 'red',
       '운영종료': 'gray'
     };
 
@@ -321,7 +325,7 @@
       const color = statusColorMap[data.status] || 'gray';
       badge.className = 'status-badge ' + color;
       badge.textContent = data.status;
-      document.getElementById('queueInfo').textContent = '📍 대기정도: ' + data.queueLocation;
+      document.getElementById('queueInfo').textContent = '📍 대기줄 위치: ' + data.queueLocation;
       document.getElementById('updatedInfo').textContent = '마지막 업데이트: ' + data.lastUpdated;
 
       const noticeEl = document.getElementById('noticeBanner');
