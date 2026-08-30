@@ -370,7 +370,7 @@
 
     /* 화면을 안 보고 있을 때는 자동으로 갱신 중단 */
     let pollTimer = null;
-    const POLL_INTERVAL = 30000; /* 30초 - 어차피 원본 반영에 몇 분 지연이 있어 이 이상 빠르게 할 필요 없음 */
+    const POLL_INTERVAL = 1000; /* 1초 */
 
     function startPolling() {
       if (pollTimer) return;
