@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bob, It's you!</title>
-  
+
   <!-- Google Analytics (GA4) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-23XEY0EJJ3"></script>
   <script>
@@ -192,12 +192,13 @@
   </div>
 
   <script>
-    // 새로 배포한 Apps Script API URL 주소를 아래에 입력하세요.
-    const API_URL = "https://script.google.com/macros/s/AKfycbzo17f-pUrcMlfL8yBk9leO1WVSUtHA--wVSUNjIO5ndnTBmUIbuFfFQwbx9sTfo8yJ/exec";
+    // 배포한 Apps Script API URL 주소
+    const API_URL = "https://script.google.com/macros/s/AKfycbzDMmI00wNPo-1SMhsv3z30ziPRlcnlyw9GQzWhtAAZNYVCpku42MbY9bK3RrRA8Q/exec";
 
     let menuDays = [];
     let todayIndex = -1;
     let selectedIndex = 0;
+    let isFirstLoad = true; /* 최초 로딩만 방문 기록, 이후 폴링은 가볍게 */
 
     const statusColorMap = {
       '운영중': 'green',
@@ -208,7 +209,10 @@
 
     async function loadAll() {
       try {
-        const response = await fetch(API_URL);
+        const url = isFirstLoad ? API_URL : API_URL + '?poll=1';
+        isFirstLoad = false;
+
+        const response = await fetch(url);
         if (!response.ok) throw new Error('네트워크 응답 오류 (' + response.status + ')');
 
         const json = await response.json();
