@@ -299,9 +299,34 @@
         (d.note ? '<div class="menu-note">' + d.note + '</div>' : '');
     }
 
-    // 초기 실행 및 10초 간격 자동 갱신
+    // 초기 실행 및 자동 갱신 (화면을 안 보고 있을 때는 자동으로 멈춤)
+    let pollTimer = null;
+
+    function startPolling() {
+      if (pollTimer) return; // 이미 돌고 있으면 중복 실행 방지
+      pollTimer = setInterval(loadAll, 2000);
+    }
+
+    function stopPolling() {
+      if (pollTimer) {
+        clearInterval(pollTimer);
+        pollTimer = null;
+      }
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        // 다른 탭으로 전환하거나 화면을 끈 경우 -> 서버 요청 중단
+        stopPolling();
+      } else {
+        // 다시 화면을 보기 시작하면 -> 즉시 한 번 갱신 후 폴링 재개
+        loadAll();
+        startPolling();
+      }
+    });
+
     loadAll();
-    setInterval(loadAll, 3000);
+    startPolling();
   </script>
 </body>
 </html>
