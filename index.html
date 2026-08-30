@@ -194,16 +194,21 @@
 
   <script>
     /**
-     * 데이터 소스: 구글 시트 "웹에 게시" (gviz/tq CSV export)
+     * 데이터 소스: 구글 시트 "CSV로 다운로드" 방식 (export?format=csv)
      * Apps Script 서버를 거치지 않고 구글 문서 인프라에서 직접 CSV를 받아오므로
      * 동시접속자가 아무리 많아도 안정적으로 처리됩니다.
      * 대신 시트 수정 후 반영까지 몇 분 정도 지연될 수 있습니다.
+     *
+     * (gviz/tq 방식은 첫 줄을 자동으로 "제목행"으로 잘못 해석하는 문제가 있어
+     *  더 단순하고 예측 가능한 export?format=csv 방식으로 변경함)
      */
     const SPREADSHEET_ID = '1D4qPtNZaiTBMuzIUYEgLfLAd35hA2jd2AezKmqggfwc';
+    const MENU_GID = '199969268';
+    const STATUS_GID = '2074973856';
 
-    function csvUrl(sheetName) {
+    function csvUrl(gid) {
       return 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID +
-        '/gviz/tq?tqx=out:csv&sheet=' + encodeURIComponent(sheetName) +
+        '/export?format=csv&gid=' + gid +
         '&_=' + Date.now(); /* 캐시 방지용 타임스탬프 */
     }
 
@@ -258,7 +263,7 @@
 
     async function loadStatus() {
       try {
-        const res = await fetch(csvUrl('상태관리'));
+        const res = await fetch(csvUrl(STATUS_GID));
         if (!res.ok) throw new Error('네트워크 응답 오류 (' + res.status + ')');
         const rows = parseCSV(await res.text());
 
@@ -276,7 +281,7 @@
 
     async function loadMenu() {
       try {
-        const res = await fetch(csvUrl('메뉴'));
+        const res = await fetch(csvUrl(MENU_GID));
         if (!res.ok) throw new Error('네트워크 응답 오류 (' + res.status + ')');
         const rows = parseCSV(await res.text());
 
