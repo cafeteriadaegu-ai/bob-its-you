@@ -321,7 +321,7 @@
       const color = statusColorMap[data.status] || 'gray';
       badge.className = 'status-badge ' + color;
       badge.textContent = data.status;
-      document.getElementById('queueInfo').textContent = '📍 대기줄 위치: ' + data.queueLocation;
+      document.getElementById('queueInfo').textContent = '📍 대기정도: ' + data.queueLocation;
       document.getElementById('updatedInfo').textContent = '마지막 업데이트: ' + data.lastUpdated;
 
       const noticeEl = document.getElementById('noticeBanner');
