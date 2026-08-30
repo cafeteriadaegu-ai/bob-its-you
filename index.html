@@ -201,6 +201,10 @@
     let selectedIndex = 0;
     let isFirstLoad = true; /* 최초 로딩만 방문 기록, 이후 폴링은 가볍게 */
 
+    /* 사람마다 요청 타이밍을 살짝 다르게 흩어서, 많은 사람이 동시에 열어도
+       서버에 요청이 한 순간에 몰리지 않도록 함 (0~1500ms 사이 무작위 지연) */
+    const jitter = Math.floor(Math.random() * 1500);
+
     const statusColorMap = {
       '운영중': 'green',
       '이용불가-조리중': 'orange',
@@ -321,14 +325,19 @@
         // 다른 탭으로 전환하거나 화면을 끈 경우 -> 서버 요청 중단
         stopPolling();
       } else {
-        // 다시 화면을 보기 시작하면 -> 즉시 한 번 갱신 후 폴링 재개
-        loadAll();
-        startPolling();
+        // 다시 화면을 보기 시작하면 -> 무작위 지연 후 갱신 (동시 몰림 방지)
+        setTimeout(() => {
+          loadAll();
+          startPolling();
+        }, jitter);
       }
     });
 
-    loadAll();
-    startPolling();
+    // 최초 로딩도 사람마다 0~1.5초 사이에서 살짝 다르게 시작 (동시 접속 분산)
+    setTimeout(() => {
+      loadAll();
+      startPolling();
+    }, jitter);
   </script>
 </body>
 </html>
