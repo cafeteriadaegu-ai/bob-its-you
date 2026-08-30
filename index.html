@@ -208,8 +208,7 @@
 
     function csvUrl(gid) {
       return 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID +
-        '/export?format=csv&gid=' + gid +
-        '&_=' + Date.now(); /* 캐시 방지용 타임스탬프 */
+        '/export?format=csv&gid=' + gid;
     }
 
     /* 간단한 CSV 파서 (따옴표로 묶인 필드 안의 쉼표/줄바꿈도 올바르게 처리) */
@@ -370,7 +369,7 @@
 
     /* 화면을 안 보고 있을 때는 자동으로 갱신 중단 */
     let pollTimer = null;
-    const POLL_INTERVAL = 1000; /* 1초 */
+    const POLL_INTERVAL = 20000; /* 20초 - 어차피 원본 반영에 몇 분 지연이 있어 이 이상 빠르게 할 필요 없음 */
 
     function startPolling() {
       if (pollTimer) return;
