@@ -363,7 +363,7 @@
       const el = document.getElementById('menuDetail');
       if (!d) { el.textContent = '등록된 메뉴가 없습니다.'; return; }
       el.innerHTML =
-        '<div class="menu-date">' + d.day + '요일 · ' + d.date + '</div>' +
+        '<div class="menu-date">' + d.date + '</div>' +
         '<div class="menu-name">' + (d.menu || '메뉴 미등록') + '</div>' +
         (d.note ? '<div class="menu-note">' + d.note + '</div>' : '');
     }
