@@ -28,14 +28,15 @@
       font-family: -apple-system, BlinkMacSystemFont, 'Malgun Gothic', sans-serif;
       background: var(--bg);
       margin: 0;
-      padding: 16px;
+      padding: clamp(16px, 4vw, 32px);
       color: #222;
-      max-width: 480px;
+      max-width: 720px;
+      width: 100%;
       margin-left: auto;
       margin-right: auto;
     }
     h1 {
-      font-size: 20px;
+      font-size: clamp(20px, 3vw, 28px);
       text-align: center;
       margin-bottom: 16px;
     }
@@ -49,11 +50,11 @@
     }
     .status-badge {
       display: inline-block;
-      padding: 10px 24px;
+      padding: clamp(10px, 1.5vw, 16px) clamp(24px, 4vw, 36px);
       border-radius: 999px;
       color: #fff;
       font-weight: bold;
-      font-size: 18px;
+      font-size: clamp(18px, 2.5vw, 24px);
       margin-bottom: 10px;
       transition: background 0.3s;
     }
@@ -62,13 +63,13 @@
     .status-badge.red { background: var(--red); }
     .status-badge.gray { background: var(--gray); }
     .queue-info {
-      font-size: 20px;
+      font-size: clamp(20px, 2.5vw, 26px);
       font-weight: bold;
       color: #333;
       margin-top: 6px;
     }
     .updated {
-      font-size: 15px;
+      font-size: clamp(15px, 1.8vw, 18px);
       color: #999;
       margin-top: 8px;
     }
@@ -87,10 +88,10 @@
     .tab {
       flex: 1;
       text-align: center;
-      padding: 8px 0;
+      padding: clamp(8px, 1.2vw, 12px) 0;
       border-radius: 8px;
       background: #eee;
-      font-size: 13px;
+      font-size: clamp(13px, 1.6vw, 16px);
       cursor: pointer;
       color: #555;
       user-select: none;
@@ -113,18 +114,18 @@
       min-height: 60px;
     }
     .menu-date {
-      font-size: 15px;
+      font-size: clamp(15px, 1.8vw, 18px);
       color: #999;
       margin-bottom: 4px;
     }
     .menu-name {
-      font-size: 17px;
+      font-size: clamp(17px, 2.2vw, 22px);
       font-weight: bold;
       white-space: pre-line;
       margin-bottom: 6px;
     }
     .menu-note {
-      font-size: 13px;
+      font-size: clamp(13px, 1.6vw, 15px);
       color: #777;
     }
     .refresh-btn {
@@ -163,7 +164,7 @@
       border-top: 1px solid #e5e5e5;
     }
     .footer-logo img {
-      max-width: 140px;
+      max-width: clamp(140px, 15vw, 200px);
       height: auto;
       opacity: 0.85;
     }
