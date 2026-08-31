@@ -66,12 +66,6 @@
     .status-badge.orange { background: var(--orange); }
     .status-badge.red { background: var(--red); }
     .status-badge.gray { background: var(--gray); }
-    .queue-info {
-      font-size: clamp(20px, 2.5vw, 26px);
-      font-weight: bold;
-      color: #333;
-      margin-top: 6px;
-    }
     .updated {
       font-size: clamp(15px, 1.8vw, 18px);
       color: #999;
@@ -182,7 +176,6 @@
 
   <div class="status-card">
     <div id="statusBadge" class="status-badge gray">불러오는 중...</div>
-    <div class="queue-info" id="queueInfo">대기줄 위치 확인 중...</div>
     <div class="updated" id="updatedInfo"></div>
   </div>
 
@@ -271,13 +264,12 @@
         if (!res.ok) throw new Error('네트워크 응답 오류 (' + res.status + ')');
         const rows = parseCSV(await res.text());
 
-        /* 상태관리 시트: 1행=현재상태, 2행=대기줄위치, 3행=마지막업데이트, 4행=공지사항 (B열 값) */
+        /* 상태관리 시트: 1행=현재상태, 2행=대기줄위치(미사용), 3행=마지막업데이트, 4행=공지사항 (B열 값) */
         const status = (rows[0] && rows[0][1]) ? rows[0][1].trim() : '정보없음';
-        const queueLocation = (rows[1] && rows[1][1]) ? rows[1][1].trim() : '안내 정보 없음';
         const lastUpdated = (rows[2] && rows[2][1]) ? rows[2][1].trim() : '-';
         const notice = (rows[3] && rows[3][1]) ? rows[3][1].trim() : '';
 
-        renderStatus({ status, queueLocation, lastUpdated, notice });
+        renderStatus({ status, lastUpdated, notice });
       } catch (err) {
         showError('상태 정보', err);
       }
@@ -325,7 +317,6 @@
       const color = statusColorMap[data.status] || 'gray';
       badge.className = 'status-badge ' + color;
       badge.textContent = data.status;
-      document.getElementById('queueInfo').textContent = '📍 대기줄 위치: ' + data.queueLocation;
       document.getElementById('updatedInfo').textContent = '마지막 업데이트: ' + data.lastUpdated;
 
       const noticeEl = document.getElementById('noticeBanner');
