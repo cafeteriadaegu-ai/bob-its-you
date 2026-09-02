@@ -156,17 +156,6 @@
     .notice-banner strong {
       margin-right: 4px;
     }
-    .footer-logo {
-      text-align: center;
-      margin-top: clamp(18px, 3vw, 36px);
-      padding-top: clamp(14px, 2vw, 24px);
-      border-top: 1px solid #e5e5e5;
-    }
-    .footer-logo img {
-      max-width: clamp(140px, 15vw, 200px);
-      height: auto;
-      opacity: 0.85;
-    }
   </style>
 </head>
 <body>
@@ -185,10 +174,6 @@
   </div>
 
   <button class="refresh-btn" onclick="loadStatus(); loadMenu();">새로고침</button>
-
-  <div class="footer-logo">
-    <img src="https://lh3.googleusercontent.com/d/1ziejh-zfnA0x3g_bCoq2DWWC7dHQw_dW" alt="대구광역시 로고">
-  </div>
 
   <script>
     /**
@@ -253,7 +238,7 @@
 
     const statusColorMap = {
       '운영중': 'green',
-      '배식지연-추가조리중': 'orange',
+      '배식중지-조리중': 'orange',
       '배식중지-만석': 'red',
       '운영종료': 'gray'
     };
