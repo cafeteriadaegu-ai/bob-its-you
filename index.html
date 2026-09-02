@@ -102,6 +102,12 @@
       cursor: pointer;
       color: #555;
       user-select: none;
+      border: none;
+      font-family: inherit;
+    }
+    .tab:focus-visible {
+      outline: 2px solid #1a73e8;
+      outline-offset: 2px;
     }
     .tab.today {
       box-shadow: inset 0 0 0 2px #1a73e8;
@@ -177,7 +183,7 @@
   </div>
 
   <div class="menu-card">
-    <div class="tabs" id="tabs"></div>
+    <div class="tabs" id="tabs" role="tablist"></div>
     <div class="menu-detail" id="menuDetail">메뉴 불러오는 중...</div>
   </div>
 
@@ -253,7 +259,7 @@
 
     async function loadStatus() {
       try {
-        const res = await fetch(csvUrl(STATUS_GID));
+        const res = await fetch(csvUrl(STATUS_GID), { cache: 'no-store' });
         if (!res.ok) throw new Error('네트워크 응답 오류 (' + res.status + ')');
         const rows = parseCSV(await res.text());
 
@@ -264,13 +270,13 @@
 
         renderStatus({ status, lastUpdated, notice });
       } catch (err) {
-        showError('상태 정보', err);
+        showStatusError(err);
       }
     }
 
     async function loadMenu() {
       try {
-        const res = await fetch(csvUrl(MENU_GID));
+        const res = await fetch(csvUrl(MENU_GID), { cache: 'no-store' });
         if (!res.ok) throw new Error('네트워크 응답 오류 (' + res.status + ')');
         const rows = parseCSV(await res.text());
 
@@ -292,17 +298,26 @@
         renderTabs();
         renderMenuDetail();
       } catch (err) {
-        showError('메뉴 정보', err);
+        showMenuError(err);
       }
     }
 
-    function showError(label, err) {
-      console.error(label + ' 로드 실패:', err);
+    /* 상태 정보 로드 실패 - 상태 카드에만 표시 (메뉴 쪽 상태는 건드리지 않음) */
+    function showStatusError(err) {
+      console.error('상태 정보 로드 실패:', err);
       const badge = document.getElementById('statusBadge');
       badge.className = 'status-badge red';
       badge.textContent = '오류 발생';
       document.getElementById('updatedInfo').textContent =
-        label + '를 불러오지 못했습니다: ' + (err && err.message ? err.message : err);
+        '상태 정보를 불러오지 못했습니다: ' + (err && err.message ? err.message : err);
+    }
+
+    /* 메뉴 정보 로드 실패 - 메뉴 카드에만 표시 (이미 불러온 상태 배지는 그대로 유지) */
+    function showMenuError(err) {
+      console.error('메뉴 정보 로드 실패:', err);
+      document.getElementById('tabs').innerHTML = '';
+      document.getElementById('menuDetail').textContent =
+        '메뉴 정보를 불러오지 못했습니다: ' + (err && err.message ? err.message : err);
     }
 
     function renderStatus(data) {
@@ -332,9 +347,12 @@
       const tabsEl = document.getElementById('tabs');
       tabsEl.innerHTML = '';
       menuDays.forEach((d, i) => {
-        const tab = document.createElement('div');
+        const tab = document.createElement('button');
+        tab.type = 'button';
         tab.textContent = d.day;
         tab.className = 'tab';
+        tab.setAttribute('role', 'tab');
+        tab.setAttribute('aria-selected', i === selectedIndex ? 'true' : 'false');
         if (i === todayIndex) tab.classList.add('today');
         if (i === selectedIndex) tab.classList.add('selected');
         tab.addEventListener('click', () => {
@@ -351,9 +369,9 @@
       const el = document.getElementById('menuDetail');
       if (!d) { el.textContent = '등록된 메뉴가 없습니다.'; return; }
       el.innerHTML =
-        '<div class="menu-date">' + d.date + '</div>' +
-        '<div class="menu-name">' + (d.menu || '메뉴 미등록') + '</div>' +
-        (d.note ? '<div class="menu-note">' + d.note + '</div>' : '');
+        '<div class="menu-date">' + escapeHtml_(d.date) + '</div>' +
+        '<div class="menu-name">' + (d.menu ? escapeHtml_(d.menu) : '메뉴 미등록') + '</div>' +
+        (d.note ? '<div class="menu-note">' + escapeHtml_(d.note) + '</div>' : '');
     }
 
     /* 화면을 안 보고 있을 때는 자동으로 갱신 중단 */
