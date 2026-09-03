@@ -168,11 +168,17 @@
       color: var(--text-muted);
       margin-bottom: 4px;
     }
-    .menu-name {
+    .menu-items {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 6px;
+    }
+    .menu-dish {
       font-size: clamp(17px, 2.2vw, 22px);
       font-weight: 600;
-      white-space: pre-line;
-      margin-bottom: 6px;
+      line-height: 1.4;
     }
     .menu-note {
       font-size: clamp(13px, 1.6vw, 15px);
@@ -374,6 +380,15 @@
       return div.innerHTML;
     }
 
+    /* 메뉴 셀 안에 줄바꿈(\n) 뿐 아니라 쉼표(,)·가운뎃점(·)·슬래시(/)로
+       구분해 적어도(예: "제육볶음, 계란국") 각 메뉴를 별도 줄로 분리해서 보여준다 */
+    function splitMenuItems_(str) {
+      return str
+        .split(/[,、·/\n]+/)
+        .map(s => s.trim())
+        .filter(s => s.length > 0);
+    }
+
     function renderTabs() {
       const tabsEl = document.getElementById('tabs');
       tabsEl.innerHTML = '';
@@ -399,9 +414,15 @@
       const d = menuDays[selectedIndex];
       const el = document.getElementById('menuDetail');
       if (!d) { el.textContent = '등록된 메뉴가 없습니다.'; return; }
+
+      const items = d.menu ? splitMenuItems_(d.menu) : [];
+      const itemsHtml = items.length
+        ? items.map(item => '<div class="menu-dish">' + escapeHtml_(item) + '</div>').join('')
+        : '<div class="menu-dish">메뉴 미등록</div>';
+
       el.innerHTML =
         '<div class="menu-date">' + escapeHtml_(d.date) + '</div>' +
-        '<div class="menu-name">' + (d.menu ? escapeHtml_(d.menu) : '메뉴 미등록') + '</div>' +
+        '<div class="menu-items">' + itemsHtml + '</div>' +
         (d.note ? '<div class="menu-note">' + escapeHtml_(d.note) + '</div>' : '');
     }
 
