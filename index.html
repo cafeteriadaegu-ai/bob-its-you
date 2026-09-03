@@ -33,9 +33,6 @@
       --accent-hover: oklch(45% 0.14 255);
     }
     * { box-sizing: border-box; }
-    html, body {
-      height: 100%;
-    }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Malgun Gothic', sans-serif;
       background: var(--bg);
@@ -47,10 +44,6 @@
       width: 100%;
       margin-left: auto;
       margin-right: auto;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
     }
     .header {
       display: flex;
@@ -106,17 +99,44 @@
     }
     .notice-banner {
       display: none;
-      padding: clamp(12px, 2vw, 16px) 4px;
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      font-size: clamp(14px, 1.8vw, 16px);
-      color: oklch(38% 0.02 80);
-      line-height: 1.5;
-      white-space: pre-line;
+      align-items: flex-start;
+      gap: 10px;
+      background: oklch(96% 0.035 75);
+      border: 1px solid oklch(84% 0.06 70);
+      border-radius: 12px;
+      padding: clamp(14px, 2vw, 18px) clamp(16px, 2.5vw, 20px);
       margin-bottom: clamp(16px, 3vw, 32px);
     }
     .notice-banner.show {
-      display: block;
+      display: flex;
+    }
+    .notice-icon {
+      stroke: oklch(55% 0.14 60);
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .notice-body {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+    .notice-label {
+      font-size: clamp(11px, 1.4vw, 12px);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: oklch(48% 0.13 55);
+      text-transform: uppercase;
+    }
+    .notice-text {
+      font-size: clamp(14px, 1.8vw, 16px);
+      font-weight: 500;
+      color: oklch(32% 0.05 55);
+      line-height: 1.5;
+      white-space: pre-line;
     }
     .menu-card {
       background: var(--card);
@@ -219,7 +239,17 @@
     <div class="updated" id="updatedInfo"></div>
   </div>
 
-  <div class="notice-banner" id="noticeBanner"></div>
+  <div class="notice-banner" id="noticeBanner">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" class="notice-icon" aria-hidden="true">
+      <path d="M12 9v4"></path>
+      <path d="M12 17h.01"></path>
+      <circle cx="12" cy="12" r="9"></circle>
+    </svg>
+    <div class="notice-body">
+      <div class="notice-label">공지</div>
+      <div class="notice-text" id="noticeText"></div>
+    </div>
+  </div>
 
   <div class="menu-card">
     <div class="tabs" id="tabs" role="tablist"></div>
@@ -365,12 +395,13 @@
       document.getElementById('updatedInfo').textContent = '마지막 업데이트: ' + data.lastUpdated;
 
       const noticeEl = document.getElementById('noticeBanner');
+      const noticeTextEl = document.getElementById('noticeText');
       if (data.notice) {
-        noticeEl.textContent = data.notice;
+        noticeTextEl.textContent = data.notice;
         noticeEl.classList.add('show');
       } else {
+        noticeTextEl.textContent = '';
         noticeEl.classList.remove('show');
-        noticeEl.textContent = '';
       }
     }
 
