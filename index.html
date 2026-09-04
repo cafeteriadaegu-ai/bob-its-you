@@ -115,15 +115,17 @@
       display: none;
       align-items: flex-start;
       gap: 10px;
-      padding-top: 14px;
-      border-top: 1px solid var(--border);
+      background: oklch(95% 0.045 70);
+      border: 1px solid oklch(80% 0.08 65);
+      border-radius: 10px;
+      padding: clamp(12px, 2vw, 16px) clamp(14px, 2vw, 18px);
     }
     .notice-banner.show {
       display: flex;
     }
     .notice-icon {
-      stroke: oklch(55% 0.14 60);
-      stroke-width: 2;
+      stroke: oklch(50% 0.16 55);
+      stroke-width: 2.2;
       stroke-linecap: round;
       stroke-linejoin: round;
       flex-shrink: 0;
@@ -137,14 +139,14 @@
     }
     .notice-label {
       font-size: clamp(11px, 1.4vw, 12px);
-      font-weight: 700;
+      font-weight: 800;
       letter-spacing: 0.04em;
-      color: oklch(48% 0.13 55);
+      color: oklch(44% 0.15 50);
       text-transform: uppercase;
     }
     .notice-text {
       font-size: clamp(14px, 1.8vw, 16px);
-      font-weight: 500;
+      font-weight: 600;
       color: oklch(32% 0.05 55);
       line-height: 1.5;
       white-space: pre-line;
@@ -442,7 +444,7 @@
       const color = statusColorMap[data.status] || 'gray';
       document.getElementById(idPrefix + 'StatusDot').className = 'status-dot ' + color;
       document.getElementById(idPrefix + 'StatusText').textContent = data.status;
-      document.getElementById(idPrefix + 'Updated').textContent = '마지막 업데이트: ' + data.lastUpdated;
+      document.getElementById(idPrefix + 'Updated').textContent = data.lastUpdated;
 
       const noticeEl = document.getElementById(idPrefix + 'Notice');
       const noticeTextEl = document.getElementById(idPrefix + 'NoticeText');
