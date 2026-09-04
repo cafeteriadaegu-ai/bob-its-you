@@ -62,15 +62,29 @@
       font-weight: 600;
       margin: 0;
     }
-    .status-card {
+    .section-label {
+      margin: clamp(4px, 1vw, 8px) 0 clamp(8px, 1.5vw, 12px);
+    }
+    .building-card {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 12px;
       padding: clamp(20px, 3vw, 32px);
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 14px;
       margin-bottom: clamp(16px, 3vw, 32px);
+    }
+    .building-name {
+      font-size: clamp(13px, 1.6vw, 15px);
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.02em;
+    }
+    .status-block {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
     .status-row {
       display: flex;
@@ -101,11 +115,8 @@
       display: none;
       align-items: flex-start;
       gap: 10px;
-      background: oklch(96% 0.035 75);
-      border: 1px solid oklch(84% 0.06 70);
-      border-radius: 12px;
-      padding: clamp(14px, 2vw, 18px) clamp(16px, 2.5vw, 20px);
-      margin-bottom: clamp(16px, 3vw, 32px);
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
     }
     .notice-banner.show {
       display: flex;
@@ -231,26 +242,51 @@
     <h1>Bob, It's you!</h1>
   </div>
 
-  <div class="status-card">
-    <div class="status-row">
-      <span id="statusDot" class="status-dot gray"></span>
-      <span id="statusText" class="status-text">불러오는 중...</span>
+  <div class="building-card">
+    <div class="building-name">산격청사</div>
+    <div class="status-block">
+      <div class="status-row">
+        <span id="sangyeokStatusDot" class="status-dot gray"></span>
+        <span id="sangyeokStatusText" class="status-text">불러오는 중...</span>
+      </div>
+      <div class="updated" id="sangyeokUpdated"></div>
     </div>
-    <div class="updated" id="updatedInfo"></div>
+    <div class="notice-banner" id="sangyeokNotice">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" class="notice-icon" aria-hidden="true">
+        <path d="M12 9v4"></path>
+        <path d="M12 17h.01"></path>
+        <circle cx="12" cy="12" r="9"></circle>
+      </svg>
+      <div class="notice-body">
+        <div class="notice-label">공지</div>
+        <div class="notice-text" id="sangyeokNoticeText"></div>
+      </div>
+    </div>
   </div>
 
-  <div class="notice-banner" id="noticeBanner">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" class="notice-icon" aria-hidden="true">
-      <path d="M12 9v4"></path>
-      <path d="M12 17h.01"></path>
-      <circle cx="12" cy="12" r="9"></circle>
-    </svg>
-    <div class="notice-body">
-      <div class="notice-label">공지</div>
-      <div class="notice-text" id="noticeText"></div>
+  <div class="building-card">
+    <div class="building-name">동인청사</div>
+    <div class="status-block">
+      <div class="status-row">
+        <span id="donginStatusDot" class="status-dot gray"></span>
+        <span id="donginStatusText" class="status-text">불러오는 중...</span>
+      </div>
+      <div class="updated" id="donginUpdated"></div>
+    </div>
+    <div class="notice-banner" id="donginNotice">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" class="notice-icon" aria-hidden="true">
+        <path d="M12 9v4"></path>
+        <path d="M12 17h.01"></path>
+        <circle cx="12" cy="12" r="9"></circle>
+      </svg>
+      <div class="notice-body">
+        <div class="notice-label">공지</div>
+        <div class="notice-text" id="donginNoticeText"></div>
+      </div>
     </div>
   </div>
 
+  <div class="eyebrow section-label">이번 주 식단</div>
   <div class="menu-card">
     <div class="tabs" id="tabs" role="tablist"></div>
     <div class="menu-detail" id="menuDetail">메뉴 불러오는 중...</div>
@@ -321,10 +357,17 @@
 
     const statusColorMap = {
       '운영중': 'green',
-      '배식지연-추가조리중': 'orange',
+      '배식중지-조리중': 'orange',
       '배식중지-만석': 'red',
       '운영종료': 'gray'
     };
+
+    /* 상태관리 시트: 1행=현재상태, 2행=대기줄위치(미사용), 3행=마지막업데이트, 4행=공지사항
+       B열=산격청사, C열=동인청사 - 열(컬럼) 인덱스만 다르고 행 의미는 동일 */
+    const BUILDINGS = [
+      { idPrefix: 'sangyeok', col: 1 }, /* B열 */
+      { idPrefix: 'dongin', col: 2 }    /* C열 */
+    ];
 
     async function loadStatus() {
       try {
@@ -332,12 +375,12 @@
         if (!res.ok) throw new Error('네트워크 응답 오류 (' + res.status + ')');
         const rows = parseCSV(await res.text());
 
-        /* 상태관리 시트: 1행=현재상태, 2행=대기줄위치(미사용), 3행=마지막업데이트, 4행=공지사항 (B열 값) */
-        const status = (rows[0] && rows[0][1]) ? rows[0][1].trim() : '정보없음';
-        const lastUpdated = (rows[2] && rows[2][1]) ? rows[2][1].trim() : '-';
-        const notice = (rows[3] && rows[3][1]) ? rows[3][1].trim() : '';
-
-        renderStatus({ status, lastUpdated, notice });
+        BUILDINGS.forEach(b => {
+          const status = (rows[0] && rows[0][b.col]) ? rows[0][b.col].trim() : '정보없음';
+          const lastUpdated = (rows[2] && rows[2][b.col]) ? rows[2][b.col].trim() : '-';
+          const notice = (rows[3] && rows[3][b.col]) ? rows[3][b.col].trim() : '';
+          renderBuildingStatus(b.idPrefix, { status, lastUpdated, notice });
+        });
       } catch (err) {
         showStatusError(err);
       }
@@ -371,13 +414,15 @@
       }
     }
 
-    /* 상태 정보 로드 실패 - 상태 카드에만 표시 (메뉴 쪽 상태는 건드리지 않음) */
+    /* 상태 정보 로드 실패 - 두 청사 카드 모두에 표시 (메뉴 쪽 상태는 건드리지 않음) */
     function showStatusError(err) {
       console.error('상태 정보 로드 실패:', err);
-      document.getElementById('statusDot').className = 'status-dot red';
-      document.getElementById('statusText').textContent = '오류 발생';
-      document.getElementById('updatedInfo').textContent =
-        '상태 정보를 불러오지 못했습니다: ' + (err && err.message ? err.message : err);
+      BUILDINGS.forEach(b => {
+        document.getElementById(b.idPrefix + 'StatusDot').className = 'status-dot red';
+        document.getElementById(b.idPrefix + 'StatusText').textContent = '오류 발생';
+        document.getElementById(b.idPrefix + 'Updated').textContent =
+          '상태 정보를 불러오지 못했습니다: ' + (err && err.message ? err.message : err);
+      });
     }
 
     /* 메뉴 정보 로드 실패 - 메뉴 카드에만 표시 (이미 불러온 상태는 그대로 유지) */
@@ -388,14 +433,15 @@
         '메뉴 정보를 불러오지 못했습니다: ' + (err && err.message ? err.message : err);
     }
 
-    function renderStatus(data) {
+    /* 청사 하나(idPrefix)의 상태 카드를 채운다. idPrefix는 'sangyeok' 또는 'dongin' */
+    function renderBuildingStatus(idPrefix, data) {
       const color = statusColorMap[data.status] || 'gray';
-      document.getElementById('statusDot').className = 'status-dot ' + color;
-      document.getElementById('statusText').textContent = data.status;
-      document.getElementById('updatedInfo').textContent = '마지막 업데이트: ' + data.lastUpdated;
+      document.getElementById(idPrefix + 'StatusDot').className = 'status-dot ' + color;
+      document.getElementById(idPrefix + 'StatusText').textContent = data.status;
+      document.getElementById(idPrefix + 'Updated').textContent = '마지막 업데이트: ' + data.lastUpdated;
 
-      const noticeEl = document.getElementById('noticeBanner');
-      const noticeTextEl = document.getElementById('noticeText');
+      const noticeEl = document.getElementById(idPrefix + 'Notice');
+      const noticeTextEl = document.getElementById(idPrefix + 'NoticeText');
       if (data.notice) {
         noticeTextEl.textContent = data.notice;
         noticeEl.classList.add('show');
