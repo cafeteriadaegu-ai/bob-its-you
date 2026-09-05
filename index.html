@@ -364,14 +364,13 @@
       '운영종료': 'gray'
     };
 
-    /* 상태관리 시트 (B열 하나만 사용, 행으로 구분):
-       1행 = 산격 현재상태   2행 = 산격 공지사항
-       3행 = 동인 현재상태   4행 = 동인 공지사항
-       5행 = 마지막 업데이트 (산격/동인 공용 - 한 곳만 있음) */
-    const UPDATED_ROW = 4; /* 0-index, 시트 5행 */
+    /* 상태관리 시트 (B열 하나만 사용, 행으로 구분 - 청사별로 3행씩):
+       1행 = 산격 현재상태   2행 = 산격 공지사항   3행 = 산격 업데이트 시간
+       4행 = 동인 현재상태   5행 = 동인 공지사항   6행 = 동인 업데이트 시간
+       (업데이트 시간은 청사마다 따로 기록됨) */
     const BUILDINGS = [
-      { idPrefix: 'sangyeok', statusRow: 0, noticeRow: 1 }, /* 시트 1~2행 */
-      { idPrefix: 'dongin', statusRow: 2, noticeRow: 3 }    /* 시트 3~4행 */
+      { idPrefix: 'sangyeok', statusRow: 0, noticeRow: 1, updatedRow: 2 }, /* 시트 1~3행 */
+      { idPrefix: 'dongin', statusRow: 3, noticeRow: 4, updatedRow: 5 }    /* 시트 4~6행 */
     ];
 
     async function loadStatus() {
@@ -380,11 +379,10 @@
         if (!res.ok) throw new Error('네트워크 응답 오류 (' + res.status + ')');
         const rows = parseCSV(await res.text());
 
-        const lastUpdated = (rows[UPDATED_ROW] && rows[UPDATED_ROW][1]) ? rows[UPDATED_ROW][1].trim() : '-';
-
         BUILDINGS.forEach(b => {
           const status = (rows[b.statusRow] && rows[b.statusRow][1]) ? rows[b.statusRow][1].trim() : '정보없음';
           const notice = (rows[b.noticeRow] && rows[b.noticeRow][1]) ? rows[b.noticeRow][1].trim() : '';
+          const lastUpdated = (rows[b.updatedRow] && rows[b.updatedRow][1]) ? rows[b.updatedRow][1].trim() : '-';
           renderBuildingStatus(b.idPrefix, { status, lastUpdated, notice });
         });
       } catch (err) {
