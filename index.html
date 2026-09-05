@@ -69,11 +69,11 @@
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: clamp(20px, 3vw, 32px);
+      padding: clamp(14px, 2.2vw, 22px);
       display: flex;
       flex-direction: column;
-      gap: 14px;
-      margin-bottom: clamp(16px, 3vw, 32px);
+      gap: 8px;
+      margin-bottom: clamp(10px, 2vw, 18px);
     }
     .building-name {
       font-size: clamp(13px, 1.6vw, 15px);
@@ -84,7 +84,7 @@
     .status-block {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 6px;
     }
     .status-row {
       display: flex;
@@ -441,7 +441,7 @@
       const color = statusColorMap[data.status] || 'gray';
       document.getElementById(idPrefix + 'StatusDot').className = 'status-dot ' + color;
       document.getElementById(idPrefix + 'StatusText').textContent = data.status;
-      document.getElementById(idPrefix + 'Updated').textContent = data.lastUpdated;
+      document.getElementById(idPrefix + 'Updated').textContent = '마지막 업데이트 시간 ' + data.lastUpdated;
 
       const noticeEl = document.getElementById(idPrefix + 'Notice');
       const noticeTextEl = document.getElementById(idPrefix + 'NoticeText');
